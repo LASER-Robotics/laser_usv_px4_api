@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(laser_uav_px4_api)
+project(laser_usv_px4_api)
 
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 17)
@@ -16,7 +16,6 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(geometry_msgs REQUIRED)
-find_package(laser_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
@@ -31,7 +30,6 @@ sensor_msgs
 nav_msgs 
 std_srvs 
 px4_msgs
-laser_msgs
 )
 
 include_directories(
@@ -65,7 +63,7 @@ ament_target_dependencies(${library_name}
 
 target_include_directories(${library_name} PRIVATE src/include)
 
-rclcpp_components_register_nodes(${library_name} "laser_uav_px4_api::ApiNode")
+rclcpp_components_register_nodes(${library_name} "laser_usv_px4_api::ApiNode")
 
 install(TARGETS ${library_name}
   ARCHIVE DESTINATION lib

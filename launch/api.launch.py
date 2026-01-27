@@ -2,11 +2,11 @@ from launch import LaunchDescription
 
 from launch.actions import DeclareLaunchArgument
 
-from launch.substitutions import PathJoinSubstitution, LaunchConfiguration, PythonExpression
+from launch.substitutions import PathJoinSubstitution, LaunchConfiguration
 
 from launch.actions import RegisterEventHandler, EmitEvent
 
-from launch_ros.actions import LifecycleNode
+from launch_ros.actions import LifecycleNode, Node
 from launch_ros.substitutions import FindPackageShare
 
 from launch.events import matches_action
@@ -16,64 +16,36 @@ from launch_ros.events.lifecycle import ChangeState
 
 import lifecycle_msgs.msg
 
-import os
-
 def generate_launch_description():
-    uav_name = os.environ['UAV_NAME']
-
-    if uav_name == "":
-        print("The uav name dont set up in yours enviroment variables")
-        return
-
-#Declare arguments
+#Initialize arguments
     declared_arguments = []
 
     declared_arguments.append(
         DeclareLaunchArgument(
-            'api_file',
-            default_value=PathJoinSubstitution([FindPackageShare('laser_uav_px4_api'),
-                                                'params', 'api.yaml']),
-            description='Full path to the file with the all parameters.'
+            'use_sim_time',
+            default_value='true',
+            description='Whether use the simulation time.'
         )
     )
 
     declared_arguments.append(
         DeclareLaunchArgument(
-            'use_sim_time',
-            default_value=PythonExpression(['"', os.getenv('REAL_UAV', "true"), '" == "false"']),
-            description='Whether use the simulation time.'))
+            'api_file',
+            default_value=PathJoinSubstitution([FindPackageShare('laser_usv_px4_api'), 'params', 'api.yaml']),
+            description='Full path to the file with the all parameters.'
+        )
+    )
 
-#Initialize arguments
     api_file = LaunchConfiguration('api_file')
 
     api_lifecycle_node = LifecycleNode(
-        package='laser_uav_px4_api',
+        package='laser_usv_px4_api',
         executable='api',
         name='px4_api',
-        namespace=uav_name,
+        namespace='',
         output='screen',
-        parameters=[api_file, {'use_sim_time': LaunchConfiguration('use_sim_time')}],
-        remappings=[
-            ('/' + uav_name + '/vehicle_command_px4_out', '/' + uav_name + '/fmu/in/vehicle_command'),
-            ('/' + uav_name + '/attitude_rates_reference_px4_out', '/' + uav_name + '/fmu/in/vehicle_rates_setpoint'),
-            ('/' + uav_name + '/motor_speed_reference_px4_out', '/' + uav_name + '/fmu/in/actuator_motors'),
-            ('/' + uav_name + '/offboard_control_mode_px4_out', '/' + uav_name + '/fmu/in/offboard_control_mode'),
-            ('/' + uav_name + '/vehicle_odometry_px4_in', '/' + uav_name + '/fmu/out/vehicle_odometry'),
-            ('/' + uav_name + '/sensor_gyro_px4_in', '/' + uav_name + '/fmu/out/sensor_gyro'),
-            ('/' + uav_name + '/sensor_accel_px4_in', '/' + uav_name + '/fmu/out/sensor_accel'),
-            ('/' + uav_name + '/vehicle_status_px4_in', '/' + uav_name + '/fmu/out/vehicle_status'),
-            ('/' + uav_name + '/vehicle_control_mode_px4_in', '/' + uav_name + '/fmu/out/vehicle_control_mode'),
-            ('/' + uav_name + '/individual_thrust_in', '/' + uav_name + '/px4_api/individual_thrust'),
-            ('/' + uav_name + '/odometry', '/' + uav_name + '/px4_api/odometry'),
-            ('/' + uav_name + '/imu', '/' + uav_name + '/px4_api/imu'),
-            ('/' + uav_name + '/arm', '/' + uav_name + '/px4_api/arm'),
-            ('/' + uav_name + '/disarm', '/' + uav_name + '/px4_api/disarm'),
-            ('/' + uav_name + '/api_diagnostics', '/' + uav_name + '/px4_api/diagnostics'),
-            ('/' + uav_name + '/motor_speed_estimation_out', '/' + uav_name + '/px4_api/motor_speed_estimated'),
-            ('/' + uav_name + '/motor_speed_reference_in', '/' + uav_name + '/control_manager/motor_speed_reference'),
-            ('/' + uav_name + '/attitude_rates_thrust_in', '/' + uav_name + '/control_manager/attitude_rates_thrust'),
-            ('/' + uav_name + '/esc_status_px4_in', '/' + uav_name + '/fmu/out/esc_status'),
-        ]
+        parameters=[api_file,{'use_sim_time': LaunchConfiguration('use_sim_time')}],
+        remappings=[]
     )
 
     event_handlers = []
