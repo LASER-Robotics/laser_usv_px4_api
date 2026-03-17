@@ -6,15 +6,22 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
 
+#include "std_msgs/msg/float32_multi_array.hpp"
+#include "std_msgs/msg/float64_multi_array.hpp"
 #include "std_srvs/srv/trigger.hpp"
+#include "geometry_msgs/msg/twist.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "nav_msgs/msg/odometry.hpp"
 
 #include "px4_msgs/msg/vehicle_command.hpp"
 #include "px4_msgs/msg/vehicle_control_mode.hpp"
+#include "px4_msgs/msg/vehicle_odometry.hpp"
 #include "px4_msgs/msg/offboard_control_mode.hpp"
 #include "px4_msgs/msg/sensor_combined.hpp"
-#include "px4_msgs/msg/vehicle_odometry.hpp"
+#include "px4_msgs/msg/rover_speed_setpoint.hpp"
+#include "px4_msgs/msg/rover_rate_setpoint.hpp"
+#include "px4_msgs/msg/rover_attitude_setpoint.hpp"
+#include "px4_msgs/msg/actuator_motors.hpp"
 
 using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
@@ -77,6 +84,29 @@ private:
   rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr srv_disarm_;
   void srvDisarm(const std::shared_ptr<std_srvs::srv::Trigger::Request> request, std::shared_ptr<std_srvs::srv::Trigger::Response> response);
 
+	// rover setpoints from cmd_vel topic
+  // rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr sub_cmd_vel_;
+  // void subCmdVel(const geometry_msgs::msg::Twist::SharedPtr msg);
+  //
+  // rclcpp_lifecycle::LifecyclePublisher<px4_msgs::msg::RoverSpeedSetpoint>::SharedPtr pub_rover_speed_setpoint_;
+  // rclcpp_lifecycle::LifecyclePublisher<px4_msgs::msg::RoverRateSetpoint>::SharedPtr pub_rover_rate_setpoint_;
+  // rclcpp_lifecycle::LifecyclePublisher<px4_msgs::msg::RoverAttitudeSetpoint>::SharedPtr pub_rover_attitude_setpoint_;
+
+	// rover actuator motors from actuators topic
+	rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr sub_actuators_;
+  void subActuators(const std_msgs::msg::Float32MultiArray::SharedPtr msg);
+
+  rclcpp_lifecycle::LifecyclePublisher<px4_msgs::msg::ActuatorMotors>::SharedPtr pub_actuator_motors_;
+
+	double _rate_pub_actuator_motors_;
+	rclcpp::TimerBase::SharedPtr tmr_pub_actuator_motors_;
+	void tmrPubActuatorMotors();
+
+	px4_msgs::msg::ActuatorMotors actuator_motors_msg_;
+
+  bool is_active_{false};
+	bool offboard_is_enabled_{false};
+
   Eigen::Quaterniond ned_enu_quaternion_rotation_;
   Eigen::Quaterniond frd_flu_rotation_;
   Eigen::Affine3d frd_flu_affine_;
@@ -86,9 +116,6 @@ private:
   Eigen::Vector3d enuToNed(Eigen::Vector3d p);
   Eigen::Vector3d frdToFlu(Eigen::Vector3d p);
   Eigen::Quaterniond enuToNedOrientation(Eigen::Quaterniond q);
-
-  bool is_active_{false};
-	bool offboard_is_enabled_{false};
 };
 } // namespace laser_usv_px4_api
 
