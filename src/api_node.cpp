@@ -137,8 +137,8 @@ void ApiNode::configPubSub() {
   sub_actuators_ = this->create_subscription<std_msgs::msg::Float32MultiArray>("rahcm/actuators", rclcpp::SensorDataQoS(), 
 																																			std::bind(&ApiNode::subActuators, this, std::placeholders::_1));
 
-  pub_imu_ = this->create_publisher<sensor_msgs::msg::Imu>("/imu", 10);
-  pub_odometry_ = this->create_publisher<nav_msgs::msg::Odometry>("/odometry", 10);
+  pub_imu_ = this->create_publisher<sensor_msgs::msg::Imu>("/rahcm/imu", 10);
+  pub_odometry_ = this->create_publisher<nav_msgs::msg::Odometry>("/rahcm/odometry", 10);
 	pub_vehicle_command_ = this->create_publisher<px4_msgs::msg::VehicleCommand>("/fmu/in/vehicle_command", 10);
 	pub_offboard_control_mode_ = this->create_publisher<px4_msgs::msg::OffboardControlMode>("/fmu/in/offboard_control_mode", 10);
 	// pub_rover_speed_setpoint_ = this->create_publisher<px4_msgs::msg::RoverSpeedSetpoint>("/fmu/in/rover_speed_setpoint", 10);
@@ -163,8 +163,8 @@ void ApiNode::configTimers() {
 void ApiNode::configServices() {
   RCLCPP_INFO(get_logger(), "initServices");
 
-	srv_arm_    = create_service<std_srvs::srv::Trigger>("arm", std::bind(&ApiNode::srvArm, this, std::placeholders::_1, std::placeholders::_2));
-  srv_disarm_ = create_service<std_srvs::srv::Trigger>("disarm", std::bind(&ApiNode::srvDisarm, this, std::placeholders::_1, std::placeholders::_2));
+	srv_arm_    = create_service<std_srvs::srv::Trigger>("rahcm/arm", std::bind(&ApiNode::srvArm, this, std::placeholders::_1, std::placeholders::_2));
+  srv_disarm_ = create_service<std_srvs::srv::Trigger>("rahcm/disarm", std::bind(&ApiNode::srvDisarm, this, std::placeholders::_1, std::placeholders::_2));
 }
 // >>>
 
