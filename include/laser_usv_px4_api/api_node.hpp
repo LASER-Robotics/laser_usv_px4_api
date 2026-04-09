@@ -18,9 +18,6 @@
 #include "px4_msgs/msg/vehicle_odometry.hpp"
 #include "px4_msgs/msg/offboard_control_mode.hpp"
 #include "px4_msgs/msg/sensor_combined.hpp"
-#include "px4_msgs/msg/rover_speed_setpoint.hpp"
-#include "px4_msgs/msg/rover_rate_setpoint.hpp"
-#include "px4_msgs/msg/rover_attitude_setpoint.hpp"
 #include "px4_msgs/msg/actuator_motors.hpp"
 
 using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
@@ -84,14 +81,6 @@ private:
   rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr srv_disarm_;
   void srvDisarm(const std::shared_ptr<std_srvs::srv::Trigger::Request> request, std::shared_ptr<std_srvs::srv::Trigger::Response> response);
 
-	// rover setpoints from cmd_vel topic
-  // rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr sub_cmd_vel_;
-  // void subCmdVel(const geometry_msgs::msg::Twist::SharedPtr msg);
-  //
-  // rclcpp_lifecycle::LifecyclePublisher<px4_msgs::msg::RoverSpeedSetpoint>::SharedPtr pub_rover_speed_setpoint_;
-  // rclcpp_lifecycle::LifecyclePublisher<px4_msgs::msg::RoverRateSetpoint>::SharedPtr pub_rover_rate_setpoint_;
-  // rclcpp_lifecycle::LifecyclePublisher<px4_msgs::msg::RoverAttitudeSetpoint>::SharedPtr pub_rover_attitude_setpoint_;
-
 	// rover actuator motors from actuators topic
 	rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr sub_actuators_;
   void subActuators(const std_msgs::msg::Float32MultiArray::SharedPtr msg);
@@ -103,6 +92,14 @@ private:
 	void tmrPubActuatorMotors();
 
 	px4_msgs::msg::ActuatorMotors actuator_motors_msg_;
+
+  bool _offboard_position_{false};
+  bool _offboard_velocity_{false};
+  bool _offboard_acceleration_{false};
+  bool _offboard_attitude_{false};
+  bool _offboard_thrust_and_torque_{false};
+  bool _offboard_body_rate_{false};
+  bool _offboard_direct_actuator_{false};
 
   bool is_active_{false};
 	bool offboard_is_enabled_{false};
