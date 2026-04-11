@@ -43,7 +43,7 @@ add_executable(${executable_name}
   src/api_main.cpp
 )
 
-set(library_name api_core)
+set(library_name usv_api_core)
 
 add_library(${library_name} SHARED
   src/api_node.cpp
@@ -54,7 +54,7 @@ ament_target_dependencies(${executable_name}
 )
 
 target_link_libraries(${executable_name}
-  api_core
+  usv_api_core
 )
 
 ament_target_dependencies(${library_name}
@@ -68,7 +68,7 @@ rclcpp_components_register_nodes(${library_name} "laser_usv_px4_api::ApiNode")
 install(TARGETS ${library_name}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
+  RUNTIME DESTINATION lib
 )
 
 install(TARGETS ${executable_name}

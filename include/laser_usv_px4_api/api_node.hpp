@@ -2,6 +2,7 @@
 #define LASER_USV_PX4_API__API_NODE_HPP_
 
 #include <Eigen/Dense>
+#include <regex>
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
@@ -103,6 +104,8 @@ private:
 
   bool is_active_{false};
 	bool offboard_is_enabled_{false};
+
+  int target_system_;
 
   Eigen::Quaterniond ned_enu_quaternion_rotation_;
   Eigen::Quaterniond frd_flu_rotation_;

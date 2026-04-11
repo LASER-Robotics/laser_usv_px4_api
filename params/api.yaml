@@ -5,10 +5,10 @@
       pub_actuator_motors: 500.0
     
     offboard: 
-      position: true  # to work with control manager
+      position: false  # to work with control manager
       velocity: false
       acceleration: false
       attitude: false
       thrust_and_torque: false
       body_rate: false
-      direct_actuator: false  # to work with teleop
+      direct_actuator: true  # to work with teleop

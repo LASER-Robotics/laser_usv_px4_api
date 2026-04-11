@@ -17,6 +17,21 @@ ApiNode::ApiNode(const rclcpp::NodeOptions &options) : rclcpp_lifecycle::Lifecyc
 	declare_parameter("offboard.body_rate", false);
 	declare_parameter("offboard.direct_actuator", false);
 
+  target_system_ = 1;
+
+  const char *usv_name = std::getenv("NAMESPACE");
+  
+  if (usv_name != nullptr) {
+    std::string name_str = std::string(usv_name);
+    std::smatch match;
+    std::regex re("(\\d+)$");
+
+    if (std::regex_search(name_str, match, re)) {
+      target_system_ = std::stoi(match[1]);
+      RCLCPP_INFO(get_logger(), "Auto-configured Target System ID: %d", target_system_);
+    }
+  }
+
   ned_enu_quaternion_rotation_ = Eigen::Quaterniond(Eigen::AngleAxisd(M_PI_2, Eigen::Vector3d::UnitZ()) *
     																								Eigen::AngleAxisd(0,      Eigen::Vector3d::UnitY()) *
     																								Eigen::AngleAxisd(M_PI,   Eigen::Vector3d::UnitX()));
@@ -138,14 +153,14 @@ void ApiNode::configPubSub() {
   sub_vehicle_control_mode_ = this->create_subscription<px4_msgs::msg::VehicleControlMode>("fmu/out/vehicle_control_mode", rclcpp::SensorDataQoS(),
                                                                                  					 std::bind(&ApiNode::subVehicleControlMode, this, std::placeholders::_1));
 
-  sub_actuators_ = this->create_subscription<std_msgs::msg::Float32MultiArray>("rahcm/actuators", rclcpp::SensorDataQoS(), 
+  sub_actuators_ = this->create_subscription<std_msgs::msg::Float32MultiArray>("actuators", rclcpp::SensorDataQoS(), 
 																																			std::bind(&ApiNode::subActuators, this, std::placeholders::_1));
 
-  pub_imu_ = this->create_publisher<sensor_msgs::msg::Imu>("/imu", 10);
-  pub_odometry_ = this->create_publisher<nav_msgs::msg::Odometry>("/odometry", 10);
-	pub_vehicle_command_ = this->create_publisher<px4_msgs::msg::VehicleCommand>("/fmu/in/vehicle_command", 10);
-	pub_offboard_control_mode_ = this->create_publisher<px4_msgs::msg::OffboardControlMode>("/fmu/in/offboard_control_mode", 10);
-	pub_actuator_motors_ = this->create_publisher<px4_msgs::msg::ActuatorMotors>("/fmu/in/actuator_motors", 10);
+  pub_imu_ = this->create_publisher<sensor_msgs::msg::Imu>("imu", 10);
+  pub_odometry_ = this->create_publisher<nav_msgs::msg::Odometry>("odometry", 10);
+	pub_vehicle_command_ = this->create_publisher<px4_msgs::msg::VehicleCommand>("fmu/in/vehicle_command", 10);
+	pub_offboard_control_mode_ = this->create_publisher<px4_msgs::msg::OffboardControlMode>("fmu/in/offboard_control_mode", 10);
+	pub_actuator_motors_ = this->create_publisher<px4_msgs::msg::ActuatorMotors>("fmu/in/actuator_motors", 10);
 }
 // >>>
 
@@ -307,13 +322,13 @@ void ApiNode::tmrPubOffboardControlMode() {
 
   px4_msgs::msg::OffboardControlMode msg{};
 
-  msg.position          = true;
-  msg.velocity          = false;
-  msg.acceleration      = false;
-  msg.attitude          = false;
-  msg.thrust_and_torque = false;
-  msg.body_rate       	= false;
-  msg.direct_actuator 	= false;
+  msg.position          = _offboard_position_;
+  msg.velocity          = _offboard_velocity_;
+  msg.acceleration      = _offboard_acceleration_;
+  msg.attitude          = _offboard_attitude_;
+  msg.thrust_and_torque = _offboard_thrust_and_torque_;
+  msg.body_rate       	= _offboard_body_rate_;
+  msg.direct_actuator 	= _offboard_direct_actuator_;
  
   msg.timestamp = get_clock()->now().nanoseconds() / 1000;
 
@@ -350,7 +365,7 @@ void ApiNode::pubVehicleCommand(int command, float param1, float param2, float p
   msg.param6           = param6;
   msg.param7           = param7;
   msg.command          = command;
-  msg.target_system    = 1;
+  msg.target_system    = target_system_;
   msg.target_component = 1;
   msg.source_system    = 1;
   msg.source_component = 1;
