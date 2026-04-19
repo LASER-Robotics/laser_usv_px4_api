@@ -256,7 +256,7 @@ void ApiNode::subOdometry(const px4_msgs::msg::VehicleOdometry::SharedPtr msg)
 
 	nav_msgs::msg::Odometry odom{};
   odom.header.stamp = get_clock()->now();
-  odom.header.frame_id = "odom";
+  odom.header.frame_id = "base_link";
   odom.child_frame_id = "base_link";
 
   Eigen::Vector3d ned_to_enu_tf(msg->position[0],

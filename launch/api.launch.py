@@ -66,6 +66,7 @@ def generate_launch_description():
             ('fmu/in/vehicle_command',      ['/', namespace_env, '/fmu/in/vehicle_command']),
             ('fmu/in/offboard_control_mode', ['/', namespace_env, '/fmu/in/offboard_control_mode']),
             ('fmu/in/actuator_motors',      ['/', namespace_env, '/fmu/in/actuator_motors']),
+            ('fmu/out/actuator_motors',     ['/', namespace_env, '/fmu/out/actuator_motors']),
             ('fmu/out/sensor_combined',     ['/', namespace_env, '/fmu/out/sensor_combined']),
             ('fmu/out/vehicle_odometry',    ['/', namespace_env, '/fmu/out/vehicle_odometry']),
             ('fmu/out/vehicle_control_mode', ['/', namespace_env, '/fmu/out/vehicle_control_mode']),
